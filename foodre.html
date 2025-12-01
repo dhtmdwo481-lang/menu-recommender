@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상황별 메뉴 추천 앱</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 기본 폰트 설정 */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+        }
+        /* 활성화된 탭 스타일 */
+        .tab-active {
+            border-bottom: 4px solid #ef4444; /* red-500 */
+            color: #ef4444;
+            font-weight: 600;
+        }
+        /* 컨셉 버튼 스타일 */
+        .concept-button {
+            transition: all 0.2s;
+            border: 2px solid #e5e7eb; /* gray-200 */
+        }
+        .concept-button:hover {
+            background-color: #fef2f2; /* red-50 */
+        }
+        /* 활성화된 컨셉 버튼 스타일 */
+        .concept-active {
+            border-color: #ef4444; /* red-500 */
+            background-color: #fef2f2; /* red-50 */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* 추천 버튼 스타일 */
+        .recommend-button {
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .recommend-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+</head>
+<body class="min-h-screen p-4 sm:p-8 flex justify-center items-start">
+
+    <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 sm:p-8 mt-10">
+        <h1 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">오늘의 메뉴 추천 🍚</h1>
+        <p class="text-gray-500 mb-8 text-center">시간대와 식사 컨셉을 선택해 주세요.</p>
+
+        <!-- 탭 네비게이션 (시간대) -->
+        <div class="flex border-b border-gray-200 mb-8">
+            <button data-tab="lunch" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none tab-active" onclick="switchTab('lunch')">
+                점심 (Lunch)
+            </button>
+            <button data-tab="dinner" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none" onclick="switchTab('dinner')">
+                저녁 (Dinner)
+            </button>
+            <button data-tab="snack" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none" onclick="switchTab('snack')">
+                야식 (Late Night)
+            </button>
+        </div>
+
+        <!-- 컨셉 선택 (식사 상황) -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">누구와 함께 먹나요? (컨셉 선택)</h2>
+            <div id="concept-selector" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <!-- 컨셉 버튼 1: 직장인 (빠르게, 간단히, 회식) -->
+                <button data-concept="office" class="concept-button p-3 rounded-lg text-center text-gray-700 active-concept" onclick="selectConcept('office')">
+                    👔 직장인
+                </button>
+                <!-- 컨셉 버튼 2: 혼밥 (편안하게, 눈치X) -->
+                <button data-concept="solo" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('solo')">
+                    🧘 혼밥러
+                </button>
+                <!-- 컨셉 버튼 3: 친구 (수다 떨며, 신나는) -->
+                <button data-concept="friends" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('friends')">
+                    👯 친구/모임
+                </button>
+                <!-- 컨셉 버튼 4: 연인 (분위기, 로맨틱) -->
+                <button data-concept="couple" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('couple')">
+                    💕 연인/데이트
+                </button>
+            </div>
+        </div>
+
+        <!-- 메뉴 추천 버튼 -->
+        <div class="text-center my-10">
+            <button class="recommend-button bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-10 rounded-full shadow-xl" onclick="handleRecommendation()">
+                메뉴 추천받기 😋
+            </button>
+        </div>
+
+        <!-- 추천 결과 영역 -->
+        <div class="mt-10 border-t pt-6">
+            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">오늘의 추천 메뉴는?</h2>
+            <div id="recommendation-result" class="bg-red-50 border-2 border-red-300 rounded-lg p-6 text-center min-h-[100px] flex items-center justify-center">
+                <p class="text-xl text-gray-500" id="result-text">시간대와 컨셉을 선택하고 버튼을 눌러보세요!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 현재 선택된 탭과 컨셉을 저장하는 상태 변수
+        let currentTab = 'lunch';
+        let currentConcept = 'office';
+
+        // 추천 결과 표시 DOM 요소
+        const resultDisplay = document.getElementById('result-text');
+
+        // 상황별 메뉴 데이터
+        const menuData = {
+            // 점심 메뉴: 빠르고, 간단하거나, 팀원 모두가 만족할 메뉴
+            lunch: {
+                office: ["구내식당", "분식 (김밥/라면)", "백반", "돈까스/제육볶음", "샌드위치"],
+                solo: ["편의점 도시락", "서브웨이", "혼밥 가능한 국밥", "샐러드", "간단한 파스타"],
+                friends: ["파스타/피자", "마라탕", "즉석 떡볶이", "초밥", "가성비 좋은 뷔페"],
+                couple: ["분위기 좋은 브런치", "수제 버거", "커플 세트 제공 이탈리안", "베트남 쌀국수"]
+            },
+            // 저녁 메뉴: 회식, 정식 식사, 분위기 등을 고려
+            dinner: {
+                office: ["삼겹살/소고기 (회식)", "감자탕", "보쌈/족발", "해물찜", "중국집 코스 요리"],
+                solo: ["배달 치킨/피자 (1인 세트)", "혼자 먹는 샤브샤브", "간단한 덮밥", "술집 혼술 안주"],
+                friends: ["닭갈비", "조개구이", "매운탕", "퓨전 요리 주점", "무한리필 고기집"],
+                couple: ["고급 레스토랑 (스테이크)", "와인바/타파스", "근사한 한정식", "스시 오마카세", "이자카야"]
+            },
+            // 야식 메뉴: 간편하고, 자극적이거나, 부담이 덜한 메뉴
+            snack: {
+                office: ["맥주와 감자튀김", "간단한 편의점 안주", "치킨 (남은 거)"], // 업무 후 동료들과
+                solo: ["봉지 라면", "과자/아이스크림", "토스트", "맥주와 쥐포"],
+                friends: ["떡볶이와 순대", "족발/보쌈", "보드카와 과일", "닭발"],
+                couple: ["집에서 만든 칵테일과 간단한 핑거푸드", "달콤한 케이크와 커피", "새벽 영화 보며 치킨"]
+            }
+        };
+
+        /**
+         * 주어진 탭과 컨셉에 맞는 메뉴를 랜덤으로 선택하여 반환합니다.
+         */
+        function generateRecommendation(tab, concept) {
+            const list = menuData[tab]?.[concept];
+            if (!list || list.length === 0) {
+                return "추천할 메뉴 데이터가 부족합니다.";
+            }
+            const randomIndex = Math.floor(Math.random() * list.length);
+            return list[randomIndex];
+        }
+
+        /**
+         * 탭 (점심/저녁/야식)을 전환하고 UI를 업데이트합니다.
+         */
+        function switchTab(targetTab) {
+            currentTab = targetTab;
+            // 모든 탭 버튼 비활성화
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('tab-active');
+            });
+            // 선택된 탭 활성화
+            document.querySelector(`.tab-button[data-tab="${targetTab}"]`).classList.add('tab-active');
+
+            // 추천 결과를 리셋
+            resultDisplay.innerHTML = "시간대와 컨셉을 선택하고 버튼을 눌러보세요!";
+        }
+
+        /**
+         * 컨셉 (직장인/혼밥/친구/연인)을 선택하고 UI를 업데이트합니다.
+         */
+        function selectConcept(targetConcept) {
+            currentConcept = targetConcept;
+            // 모든 컨셉 버튼 비활성화
+            document.querySelectorAll('.concept-button').forEach(btn => {
+                btn.classList.remove('concept-active');
+            });
+            // 선택된 컨셉 버튼 활성화
+            document.querySelector(`.concept-button[data-concept="${targetConcept}"]`).classList.add('concept-active');
+
+            // 추천 결과를 리셋
+            resultDisplay.innerHTML = "시간대와 컨셉을 선택하고 버튼을 눌러보세요!";
+        }
+
+        /**
+         * 추천 버튼 클릭 이벤트 핸들러. 선택된 탭과 컨셉을 기반으로 결과를 표시합니다.
+         */
+        function handleRecommendation() {
+            // 로딩 효과 설정
+            const placeholder = "최적의 메뉴를 고르는 중";
+            const dots = ["", ".", "..", "..."];
+            let dotIndex = 0;
+
+            resultDisplay.innerHTML = `<span class="text-red-600 font-bold">${placeholder}</span>`;
+
+            const interval = setInterval(() => {
+                dotIndex = (dotIndex + 1) % dots.length;
+                resultDisplay.innerHTML = `<span class="text-red-600 font-bold">${placeholder}${dots[dotIndex]}</span>`;
+            }, 100);
+
+
+            setTimeout(() => {
+                clearInterval(interval);
+                const recommendedMenu = generateRecommendation(currentTab, currentConcept);
+                let message = "";
+
+                if (currentConcept === 'office') message = "직장인의 빠르고 맛있는 한 끼!";
+                else if (currentConcept === 'solo') message = "오늘은 나만을 위한 여유로운 식사!";
+                else if (currentConcept === 'friends') message = "친구들과 즐겁게 먹기 좋은 메뉴!";
+                else if (currentConcept === 'couple') message = "연인과의 로맨틱한 식사 시간!";
+                else message = "맛있게 드세요!";
+
+                // 추천 결과를 표시
+                resultDisplay.innerHTML = `<span class="text-3xl sm:text-4xl font-extrabold text-red-600 animate-pulse">${recommendedMenu}</span>
+                                            <p class="mt-2 text-gray-600">${message}</p>`;
+
+            }, 700); // 0.7초 후 결과 표시
+        }
+
+        // 초기 로드 시 초기 설정
+        document.addEventListener('DOMContentLoaded', () => {
+            // 초기 탭 설정 (lunch)은 HTML에서 이미 처리됨
+            // 초기 컨셉 'office'를 active로 설정
+            document.querySelector(`.concept-button[data-concept="${currentConcept}"]`).classList.add('concept-active');
+            // 초기 안내 메시지
+            resultDisplay.innerHTML = "시간대와 컨셉을 선택하고 버튼을 눌러보세요!";
+        });
+    </script>
+</body>
+</html>
