@@ -1,17 +1,15 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta name="google-adsense-account" content="ca-pub-1456890725720984">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상황별 메뉴 추천 앱</title>
+    <title>상황별 메뉴 추천 앱 | 푸드 블로그</title>
+    
+    <!-- 🌟 Google AdSense 계정 인증 메타 태그 (요청하신 ID 적용) 🌟 -->
+    <meta name="google-adsense-account" content="ca-pub-1456890725720984">
 
-    <!-- 🌟 Google AdSense 자동 광고(Auto Ads) 코드 삽입 위치 🌟 -->
-    <!-- AdSense 대시보드에서 받은 실제 코드를 여기에 붙여 넣으세요. -->
+    <!-- 🌟 Google AdSense 자동 광고(Auto Ads) 코드 삽입 위치 (ID 적용) 🌟 -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1456890725720984" crossorigin="anonymous"></script>
-
-    <!-- AdSense 소유권 확인을 위한 메타 태그 (승인 후 삭제 가능) -->
-    <!-- <meta name="google-adsense-account" content="ca-pub-YOUR_ADSENSE_ID"> -->
 
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -51,126 +49,164 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
         }
+        /* 블로그 링크 스타일 */
+        .blog-post-link {
+            transition: transform 0.2s;
+        }
+        .blog-post-link:hover {
+            transform: translateX(5px);
+            background-color: #fef2f2;
+        }
+        /* 토글 버튼 아이콘 크기 조정 */
+        #toggle-icon {
+            font-size: 1.5rem;
+            display: block;
+        }
     </style>
 </head>
 <body class="min-h-screen p-4 sm:p-8 flex justify-center items-start">
 
     <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 sm:p-8 mt-10">
-        <h1 class="text-3xl font-extrabold text-gray-900 mb-6 text-center">오늘의 메뉴 추천 🍚</h1>
-        <p class="text-gray-500 mb-8 text-center">시간대와 식사 컨셉을 선택해 주세요.</p>
-
-        <!-- 탭 네비게이션 (시간대) -->
-        <div class="flex border-b border-gray-200 mb-8">
-            <button data-tab="lunch" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none tab-active" onclick="switchTab('lunch')">
-                점심 (Lunch)
-            </button>
-            <button data-tab="dinner" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none" onclick="switchTab('dinner')">
-                저녁 (Dinner)
-            </button>
-            <button data-tab="snack" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none" onclick="switchTab('snack')">
-                야식 (Late Night)
+        
+        <!-- HEADER WITH TOGGLE BUTTON -->
+        <div class="relative mb-6 pb-2">
+            <h1 class="text-3xl font-extrabold text-gray-900 text-center" id="main-header-title">오늘의 메뉴 추천 😋</h1>
+            <p class="text-gray-500 mt-2 text-center" id="subtitle-text">시간대와 식사 컨셉을 선택해 주세요.</p>
+            
+            <!-- 토글 버튼 (Top Right) -->
+            <button id="view-toggle-button" class="absolute top-0 right-0 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition duration-200 transform hover:scale-105" onclick="toggleView()">
+                <!-- 초기 아이콘: 블로그(📚)로 전환하라는 뜻 -->
+                <span id="toggle-icon">📚</span> 
             </button>
         </div>
+        <!-- END HEADER -->
 
-        <!-- 컨셉 선택 (식사 상황) -->
-        <div class="mb-8">
-            <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">누구와 함께 먹나요? (컨셉 선택)</h2>
-            <div id="concept-selector" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                <!-- 컨셉 버튼 1: 직장인 -->
-                <button data-concept="office" class="concept-button p-3 rounded-lg text-center text-gray-700 active-concept" onclick="selectConcept('office')">
-                    👔 직장인
+
+        <!-- 메뉴 추천 기능 영역 (기존 콘텐츠) -->
+        <div id="recommendation-app" class="tab-content">
+            <!-- 탭 네비게이션 (점심/저녁/야식만 남음) -->
+            <div id="menu-tabs-container" class="flex border-b border-gray-200 mb-8">
+                <button data-tab="lunch" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none tab-active" onclick="switchTab('lunch')">
+                    점심
                 </button>
-                <!-- 컨셉 버튼 2: 혼밥 -->
-                <button data-concept="solo" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('solo')">
-                    🧘 혼밥러
+                <button data-tab="dinner" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none" onclick="switchTab('dinner')">
+                    저녁
                 </button>
-                <!-- 컨셉 버튼 3: 친구 -->
-                <button data-concept="friends" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('friends')">
-                    👯 친구/모임
+                <button data-tab="snack" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none" onclick="switchTab('snack')">
+                    야식
                 </button>
-                <!-- 컨셉 버튼 4: 연인 -->
-                <button data-concept="couple" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('couple')">
-                    💕 연인/데이트
+            </div>
+
+            <!-- 컨셉 선택 (식사 상황) -->
+            <div class="mb-8">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">누구와 함께 먹나요? (컨셉 선택)</h2>
+                <div id="concept-selector" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <button data-concept="office" class="concept-button p-3 rounded-lg text-center text-gray-700 active-concept concept-active" onclick="selectConcept('office')">
+                        👔 직장인
+                    </button>
+                    <button data-concept="solo" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('solo')">
+                        🧘 혼밥러
+                    </button>
+                    <button data-concept="friends" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('friends')">
+                        👯 친구/모임
+                    </button>
+                    <button data-concept="couple" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('couple')">
+                        💕 연인/데이트
+                    </button>
+                </div>
+            </div>
+
+            <!-- 💰 광고 배너 삽입 위치 1 (ID 적용) -->
+            <div class="my-6 p-4 border border-dashed border-red-300 bg-red-50 text-center rounded-lg">
+                <p class="text-sm text-red-500 mb-2">Google AdSense 광고 영역</p>
+                <ins class="adsbygoogle"
+                    style="display:block"
+                    data-ad-client="ca-pub-1456890725720984"
+                    data-ad-slot="YOUR_AD_SLOT_ID_1"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+            <!-- 💰 광고 영역 끝 -->
+
+            <!-- 메뉴 추천 버튼 -->
+            <div class="text-center my-10">
+                <button class="recommend-button bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-10 rounded-full shadow-xl" onclick="handleRecommendation()">
+                    메뉴 추천받기 😋
                 </button>
+            </div>
+
+            <!-- 추천 결과 영역 -->
+            <div class="mt-10 border-t pt-6">
+                <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">오늘의 추천 메뉴는?</h2>
+                <div id="recommendation-result" class="bg-red-50 border-2 border-red-300 rounded-lg p-6 text-center min-h-[100px] flex items-center justify-center">
+                    <p class="text-xl text-gray-500" id="result-text">시간대와 컨셉을 선택하고 버튼을 눌러보세요!</p>
+                </div>
             </div>
         </div>
 
-        <!-- 💰 광고 배너 삽입 위치 1: 메인 컨텐츠 중간 -->
-        <div class="my-6 p-4 border border-dashed border-red-300 bg-red-50 text-center rounded-lg">
-            <p class="text-sm text-red-500 mb-2">Google AdSense 광고 영역 (추천 결과 위)</p>
-            <!-- 🌟 여기에 디스플레이 광고 단위 코드를 붙여넣으세요 🌟 -->
-            <!-- 예: <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-YOUR_ADSENSE_ID" data-ad-slot="YOUR_AD_SLOT_ID"></ins> -->
-            <ins class="adsbygoogle"
-                 style="display:block"
-                 data-ad-client="ca-pub-YOUR_ADSENSE_ID"
-                 data-ad-slot="YOUR_AD_SLOT_ID"></ins>
-            <script>
-                 (adsbygoogle = window.adsbygoogle || []).push({});
-            </script>
-        </div>
-        <!-- 💰 광고 영역 끝 -->
-
-
-        <!-- 메뉴 추천 버튼 -->
-        <div class="text-center my-10">
-            <button class="recommend-button bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-10 rounded-full shadow-xl" onclick="handleRecommendation()">
-                메뉴 추천받기 😋
-            </button>
-        </div>
-
-        <!-- 추천 결과 영역 -->
-        <div class="mt-10 border-t pt-6">
-            <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">오늘의 추천 메뉴는?</h2>
-            <div id="recommendation-result" class="bg-red-50 border-2 border-red-300 rounded-lg p-6 text-center min-h-[100px] flex items-center justify-center">
-                <p class="text-xl text-gray-500" id="result-text">시간대와 컨셉을 선택하고 버튼을 눌러보세요!</p>
+        <!-- 블로그 영역 (새로 추가된 콘텐츠) -->
+        <div id="blog-content" class="tab-content hidden">
+            <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">최신 푸드 블로그 글</h2>
+            <div id="post-list" class="space-y-4">
+                <!-- 블로그 글 목록이 여기에 JS로 삽입됩니다 -->
+            </div>
+            
+            <!-- 💰 광고 배너 삽입 위치 2: 블로그 페이지 중간 (ID 적용) -->
+            <div class="my-8 p-4 border border-dashed border-red-300 bg-red-50 text-center rounded-lg">
+                <p class="text-sm text-red-500 mb-2">Google AdSense 광고 영역</p>
+                <ins class="adsbygoogle"
+                    style="display:block"
+                    data-ad-client="ca-pub-1456890725720984"
+                    data-ad-slot="YOUR_AD_SLOT_ID_2"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
             </div>
         </div>
+        
     </div>
+
+    <!-- 푸터 (Footer) 영역 추가 -->
+    <footer class="w-full max-w-2xl mt-10 p-4 text-center text-sm text-gray-500">
+        <div class="flex justify-center space-x-4 mb-2">
+            <!-- 정책 페이지 링크 (AdSense 승인에 매우 중요) -->
+            <a href="privacy.html" class="hover:text-red-500 transition">개인정보 처리방침</a>
+            <a href="terms.html" class="hover:text-red-500 transition">이용약관</a>
+            <a href="contact.html" class="hover:text-red-500 transition">문의하기</a>
+        </div>
+        <p>&copy; 2025 메뉴 추천 앱. All rights reserved.</p>
+    </footer>
 
     <script>
         // 현재 선택된 탭과 컨셉을 저장하는 상태 변수
         let currentTab = 'lunch';
         let currentConcept = 'office';
+        let isMenuAppView = true; // 현재 메뉴 앱 화면인지 (초기값 true)
 
-        // 추천 결과 표시 DOM 요소
+        // DOM 요소
         const resultDisplay = document.getElementById('result-text');
+        const recommendationApp = document.getElementById('recommendation-app');
+        const blogContent = document.getElementById('blog-content');
+        const postList = document.getElementById('post-list');
+        const subtitleText = document.getElementById('subtitle-text');
+        const menuTabsContainer = document.getElementById('menu-tabs-container');
+        const toggleIcon = document.getElementById('toggle-icon');
+        const mainHeaderTitle = document.getElementById('main-header-title');
 
-        // 상황별 메뉴 데이터 (각 탭별 45가지 이상으로 확장됨)
+        // 예시 블로그 콘텐츠 (실제로는 이 내용을 늘려서 사용해야 합니다!)
+        const blogPosts = [
+            { id: 1, title: "혼밥러를 위한 전국 국밥 맛집 BEST 5", date: "2025.12.01", summary: "혼자 먹어도 든든하고 맛있는 국밥 맛집을 엄선했습니다. 추운 겨울 몸을 녹여줄 뜨끈한 국밥 한 그릇을 만나보세요.", content: "이 글은 심사를 위한 샘플 콘텐츠입니다. 실제로는 이 위치에 글 상세 내용이 최소 800자 이상으로 표시되어야 합니다. 국밥의 역사, 종류, 맛집 정보, 리뷰 등을 상세히 다룰 수 있습니다." },
+            { id: 2, title: "직장인 점심 메뉴 선택 장애, 이제 그만!", date: "2025.11.25", summary: "매일 반복되는 점심 메뉴 고민을 해결해줄 퀵 가이드와 메뉴별 칼로리 정보를 담았습니다.", content: "이 글은 심사를 위한 샘플 콘텐츠입니다. 실제로는 이 위치에 글 상세 내용이 최소 800자 이상으로 표시되어야 합니다. 직장인의 다양한 점심 상황을 분석하고, 메뉴 추천 앱을 활용하는 방법 등을 구체적으로 설명할 수 있습니다." },
+            { id: 3, title: "데이트 성공률 100%! 분위기 좋은 이탈리안 레스토랑 추천", date: "2025.11.18", summary: "연인과의 기념일이나 특별한 날을 위한 로맨틱한 장소를 소개합니다. 파스타와 와인이 환상적인 조화를 이룹니다.", content: "이 글은 심사를 위한 샘플 콘텐츠입니다. 실제로는 이 위치에 글 상세 내용이 최소 800자 이상으로 표시되어야 합니다. 데이트 코스, 예약 팁, 메뉴 상세 리뷰 등을 사진과 함께 제공하면 좋습니다." }
+        ];
+
+        // 상황별 메뉴 데이터 (이전 요청으로 45가지 이상으로 확장된 데이터)
         const menuData = {
-            // ====================================================================
-            // 점심 메뉴 (Lunch): 빠르고, 간단하거나, 팀원 모두가 만족할 메뉴 (45가지 이상)
-            // ====================================================================
             lunch: {
-                // 직장인: 신속, 단체 만족, 근처 맛집, 깔끔함
-                office: [
-                    "구내식당", "백반 (제육/김치찌개)", "순두부찌개", "돈까스 정식", "칼국수/수제비", "콩나물국밥", "삼각김밥+컵라면", 
-                    "샐러드 전문점", "서브웨이", "분식 (떡볶이/김밥)", "중국집 볶음밥", "국밥 (돼지/소)", "뼈해장국", "샌드위치", 
-                    "닭갈비 런치", "부대찌개 (단체)", "육개장", "비빔밥/돌솥밥", "김치찌개/된장찌개", "막국수/냉면", "타코/브리또",
-                    "도시락 전문점", "햄버거 세트", "돈부리/카레", "초밥 런치 세트", "감자탕 런치", "쌈밥 정식", "제육볶음 정식", 
-                    "즉석 떡볶이", "팟타이/쌀국수", "순대국", "쫄면", "비빔냉면", "잔치국수", "마라탕 (깔끔한 맛)", "낙지볶음",
-                    "닭개장", "만둣국", "버섯전골", "설렁탕", "오므라이스", "새우볶음밥", "볶음우동", "밀면", "강된장 비빔밥"
-                ],
-                // 혼밥러: 간편, 눈치 X, 빨리 먹고 쉴 수 있는 메뉴
-                solo: [
-                    "편의점 도시락", "서브웨이", "혼밥 가능한 국밥", "샐러드", "간단한 파스타", "라면/만두", "덮밥 (장어/새우)", 
-                    "마제소바", "키오스크 주문 식당", "토스트", "가츠동", "오므라이스", "브런치 카페", "혼자 먹는 샤브샤브", 
-                    "타코야끼", "베이글/크림치즈", "콩국수 (여름)", "비빔국수", "짜장면 (혼밥)","봉골레 파스타", "냉동 볶음밥", 
-                    "샌드위치 전문점", "스시 런치 (바席)", "닭가슴살 샐러드", "컵밥", "마라탕 (1인분)", "칼국수 (1인)", 
-                    "감자튀김", "핫도그", "와플", "마제소바", "냉모밀", "짬뽕 (1인)", "파니니", "에그마요 샌드위치", 
-                    "소바", "우동", "김밥 한 줄", "쫄면", "떡꼬치", "크림 파스타", "알리오 올리오", "아보카도 샌드위치",
-                    "단팥죽", "죽 전문점", "수제 햄버거"
-                ],
-                // 친구/모임: 수다, 재미, 취향 다양성, 가성비, 나눔
-                friends: [
-                    "파스타/피자 (세트)", "마라탕", "즉석 떡볶이", "초밥 뷔페", "가성비 좋은 뷔페", "닭갈비", "샤브샤브 뷔페", 
-                    "보쌈/족발", "중식 코스", "무한리필 고기", "멕시칸 타코파티", "감자탕 (중)", "아웃백/빕스", "전골 요리",
-                    "해물찜/아구찜", "삼겹살 (점심 특선)", "인도 커리", "분위기 좋은 카페 샌드위치", "방탈출 후 김치찌개",
-                    "이색 라멘집", "인스타 감성 샐러드", "퓨전 한식 주점", "수제버거 맛집", "대패삼겹살 무한리필", 
-                    "치킨 + 맥주 (치맥)", "분식 파티 (튀김/순대)", "베트남 분짜", "찜닭", "브런치 플레이트", "연어 덮밥",
-                    "마늘 보쌈", "냉채족발", "양꼬치", "팟타이", "나시고랭", "태국식 커리", "퓨전 멕시칸", "홍합탕",
-                    "수제 돈까스 맛집", "김치전/부추전", "삼계탕", "닭곰탕", "순대볶음", "볶음밥 퓨전", "닭한마리 칼국수"
-                ],
-                // 연인/데이트: 분위기, 로맨틱, 사진, 특별한 메뉴
-                couple: [
-                    "분위기 좋은 브런치", "수제 버거", "커플 세트 제공 이탈리안", "베트남 쌀국수", "파스타/리조또", "고급 스테이크", 
-                    "전망 좋은 레스토랑", "와인과 간단한 치즈", "마카롱 & 커피", "예쁜 한정식", "퓨전 일
+                office: ["구내식당", "백반 (제육/김치찌개)", "순두부찌개", "돈까스 정식", "칼국수/수제비", "콩나물국밥", "삼각김밥+컵라면", "샐러드 전문점", "서브웨이", "분식 (떡볶이/김밥)", "중국집 볶음밥", "국밥 (돼지/소)", "뼈해장국", "샌드위치", "닭갈비 런치", "부대찌개 (단체)", "육개장", "비빔밥/돌솥밥", "김치찌개/된장찌개", "막국수/냉면", "타코/브리또", "도시락 전문점", "햄버거 세트", "돈부리/카레", "초밥 런치 세트", "감자탕 런치", "쌈밥 정식", "제육볶음 정식", "즉석 떡볶이", "팟타이/쌀국수", "순대국", "쫄면", "비빔냉면", "잔치국수", "마라탕 (깔끔한 맛)", "낙지볶음", "닭개장", "만둣국", "버섯전골", "설렁탕", "오므라이스", "새우볶음밥", "볶음우동", "밀면", "강된장 비빔밥"],
+                solo: ["편의점 도시락", "서브웨이", "혼밥 가능한 국밥", "샐러드", "간단한 파스타", "라면/만두", "덮밥 (장어/새우)", "마제소바", "키오스크 주문 식당", "토스트", "가츠동", "오므라이스", "브런치 카페", "혼자 먹는 샤브샤브", "타코야끼", "베이글/크림치즈", "콩국수 (여름)", "비빔국수", "짜장면 (혼밥)","봉골레 파스타", "냉동 볶음밥", "샌드위치 전문점", "스시 런치 (바席)", "닭가슴살 샐러드", "컵밥", "마라탕 (1인분)", "칼국수 (1인)", "감자튀김", "핫도그", "와플", "마제소바", "냉모밀", "짬뽕 (1인)", "파니니", "에그마요 샌드위치", "소바", "우동", "김밥 한 줄", "쫄면", "떡꼬치", "크림 파스타", "알리오 올리오", "아보카도 샌드위치", "단팥죽", "죽 전문점", "수제 햄버거"],
+                friends: ["파스타/피자 (세트)", "마라탕", "즉석 떡볶이", "초밥 뷔페", "가성비 좋은 뷔페", "닭갈비", "샤브샤브 뷔페", "보쌈/족발", "중식 코스", "무한리필 고기", "멕시칸 타코파티", "감자탕 (중)", "아웃백/빕스", "전골 요리", "해물찜/아구찜", "삼겹살 (점심 특선)", "인도 커리", "분위기 좋은 카페 샌드위치", "방탈출 후 김치찌개", "이색 라멘집", "인스타 감성 샐러드", "퓨전 한식 주점", "수제버거 맛집", "대패삼겹살 무한리필", "치킨 + 맥주 (치맥)", "분식 파티 (튀김/순대)", "베트남 분짜", "찜닭", "브런치 플레이트", "연어 덮밥", "마늘 보쌈", "냉채족발", "양꼬치", "팟타이", "나시고랭", "태국식 커리", "퓨전 멕시칸", "홍합탕", "수제 돈까스 맛집", "김치전/부추전", "삼계탕", "닭곰탕", "순대볶음", "볶음밥 퓨전", "닭한마리 칼국수"],
+                couple: ["분위기 좋은 브런치", "수제 버거", "커플 세트 제공 이탈리안", "베트남 쌀국수", "파스타/리조또", "고급 스테이크", "전망 좋은 레스토랑", "와인과 간단한 치즈", "마카롱 & 커피", "예쁜 한정식", "퓨전 일식", "딤섬 맛집", "아보카도 샌드위치", "팬케이크 맛집", "스시/사시미 정식", "갤러리 카페", "해산물 파스타", "수플레 팬케이크", "타파스 바", "라멘 정식", "초콜릿 전문점", "전통 차와 약과", "철판 요리", "멕시칸 화이타", "화덕 피자", "프랑스 가정식", "아이스크림 젤라또", "에그 베네딕트", "크로플 전문점", "고급 빵집", "프렌치 토스트", "프리미엄 샐러드", "버섯 크림 리조또", "오븐 스파게티", "빠네 파스타", "타르트와 아메리카노", "수제 초콜릿", "칵테일 브런치", "시금치 피자", "연어 스테이크", "문어 숙회", "크로와상 샌드위치", "에이드 맛집", "전통 퓨전 비빔밥", "고급 도넛", "타코"]
+            },
+            dinner: {
