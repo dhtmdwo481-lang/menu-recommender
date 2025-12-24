@@ -1,250 +1,125 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>상황별 메뉴 추천 앱 | 푸드 블로그</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>메뉴 추천 블로그</title>
+
     <style>
-        /* 기본 폰트 설정 */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f7f7;
+        body { 
+            font-family: Arial, sans-serif; 
+            background: #f5f5f5; 
+            padding: 20px; 
+        }
+        #blogList {
+            max-width: 800px; 
+            margin: 0 auto;
+        }
+        .blog-card {
+            background: #fff;
+            padding: 24px;
+            margin-bottom: 30px;
+            border-radius: 14px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .blog-card h2 {
+            margin-bottom: 8px; 
+            font-size: 22px;
+        }
+        .blog-card small {
+            color: #777;
+        }
+        .blog-summary {
+            margin-top: 10px;
             line-height: 1.6;
+            color: #444;
         }
-        /* 활성화된 탭 스타일 */
-        .tab-active {
-            border-bottom: 4px solid #ef4444; /* red-500 */
-            color: #ef4444;
-            font-weight: 600;
-        }
-        /* 컨셉 버튼 스타일 */
-        .concept-button {
-            transition: all 0.2s;
-            border: 2px solid #e5e7eb; /* gray-200 */
-            background-color: #ffffff;
-        }
-        .concept-button:hover {
-            background-color: #fef2f2; /* red-50 */
-        }
-        /* 활성화된 컨셉 버튼 스타일 */
-        .concept-active {
-            border-color: #ef4444; /* red-500 */
-            background-color: #fef2f2; /* red-50 */
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        /* 추천 버튼 스타일 */
-        .recommend-button {
-            transition: all 0.2s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .recommend-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        }
-        /* 블로그 링크 스타일 */
-        .blog-post-link {
-            transition: transform 0.2s;
-        }
-        .blog-post-link:hover {
-            transform: translateX(5px);
-            background-color: #fef2f2;
-        }
-        /* 토글 버튼 아이콘 크기 조정 */
-        #toggle-icon {
-            font-size: 1.5rem;
-            display: block;
-        }
-        
-        /* === 블로그 상세 콘텐츠 가독성 개선 === */
-        .post-body p {
-            margin-bottom: 1.5rem;
-        }
-
-        .post-body strong {
-            display: block; 
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            font-size: 1.25rem;
-            color: #c52d2d;
-            border-left: 5px solid #ef4444;
-            padding-left: 1rem;
-            font-weight: 800;
-            line-height: 1.4;
-        }
-
-        .post-body ul, .post-body ol {
-            margin-left: 1.5rem;
-            padding-left: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .post-body ul {
-            list-style-type: '👉 ';
-        }
-        .post-body ol {
-            list-style-type: decimal;
-        }
-        .post-body li {
-            margin-bottom: 0.75rem;
+        .blog-content {
+            margin-top: 20px;
+            line-height: 1.7;
+            color: #333;
         }
     </style>
 </head>
-<body class="min-h-screen p-4 sm:p-8 flex justify-center items-start">
 
-    <div class="w-full max-w-2xl bg-white rounded-xl shadow-2xl p-6 sm:p-8 mt-10">
-        
-        <div class="relative mb-6 pb-2">
-            <h1 class="text-3xl font-extrabold text-gray-900 text-center" id="main-header-title">오늘의 메뉴 추천 😋</h1>
-            <p class="text-gray-500 mt-2 text-center" id="subtitle-text">시간대와 식사 컨셉을 선택해 주세요.</p>
-            
-            <button id="view-toggle-button" class="absolute top-0 right-0 p-2 bg-red-500 hover:bg-red-600 text-white rounded-full shadow-lg transition duration-200 transform hover:scale-105" onclick="toggleView()">
-                <span id="toggle-icon">📚</span> 
-            </button>
-        </div>
+<body>
 
-        <div id="recommendation-app" class="tab-content">
-            <div id="menu-tabs-container" class="flex border-b border-gray-200 mb-8">
-                <button data-tab="lunch" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none tab-active" onclick="switchTab('lunch')">점심</button>
-                <button data-tab="dinner" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none" onclick="switchTab('dinner')">저녁</button>
-                <button data-tab="snack" class="tab-button flex-1 py-3 text-center text-gray-600 transition duration-300 hover:text-red-500 focus:outline-none" onclick="switchTab('snack')">야식</button>
-            </div>
-
-            <div class="mb-8">
-                <h2 class="text-xl font-semibold text-gray-800 mb-4 text-center">누구와 함께 먹나요?</h2>
-                <div id="concept-selector" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                    <button data-concept="office" class="concept-button p-3 rounded-lg text-center text-gray-700 concept-active" onclick="selectConcept('office')">👔 직장인</button>
-                    <button data-concept="solo" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('solo')">🧘 혼밥러</button>
-                    <button data-concept="friends" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('friends')">👯 친구/모임</button>
-                    <button data-concept="couple" class="concept-button p-3 rounded-lg text-center text-gray-700" onclick="selectConcept('couple')">💕 연인/데이트</button>
-                </div>
-            </div>
-
-            <div class="text-center my-10">
-                <button class="recommend-button bg-red-500 hover:bg-red-600 text-white font-bold py-4 px-10 rounded-full shadow-xl" onclick="handleRecommendation()">
-                    메뉴 추천받기 😋
-                </button>
-            </div>
-
-            <div class="mt-10 border-t pt-6">
-                <h2 class="text-2xl font-semibold text-gray-800 text-center mb-4">오늘의 추천 메뉴는?</h2>
-                <div id="recommendation-result" class="bg-red-50 border-2 border-red-300 rounded-lg p-6 text-center min-h-[100px] flex items-center justify-center">
-                    <p class="text-xl text-gray-500" id="result-text">버튼을 눌러보세요!</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="blog-content" class="tab-content hidden">
-            <div id="post-list-container">
-                <h2 class="text-2xl font-bold text-gray-900 mb-6 text-center">최신 푸드 블로그 글</h2>
-                <div id="post-list" class="space-y-4">
-                    </div>
-            </div>
-
-            <div id="post-detail-container" class="hidden">
-                <button onclick="showPostList()" class="text-red-500 hover:text-red-700 font-semibold mb-4 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                    </svg>
-                    목록으로 돌아가기
-                </button>
-                <h2 id="post-detail-title" class="text-3xl font-bold text-gray-900 mb-3"></h2>
-                <p id="post-detail-date" class="text-sm text-gray-500 border-b pb-4 mb-6"></p>
-                <div id="post-detail-body" class="post-body text-gray-700">
-                    </div>
-            </div>
-        </div>
-        
-        <footer class="w-full p-4 text-center text-sm text-gray-500 border-t border-gray-200 pt-6 mt-6">
-            <div class="flex justify-center space-x-4 mb-2">
-                <a href="#" class="hover:text-red-500 transition">개인정보 처리방침</a>
-                <a href="#" class="hover:text-red-500 transition">이용약관</a>
-                <a href="#" class="hover:text-red-500 transition">문의하기</a>
-            </div>
-            <p>&copy; 2025 메뉴 추천 앱. All rights reserved.</p>
-        </footer>
-    </div>
+    <div id="blogList"></div>
 
     <script>
-        // --- 데이터 및 상태 변수 ---
-        let currentTab = 'lunch';
-        let currentConcept = 'office';
-        let isMenuAppView = true;
-
+        /* ---------------------------------------------------------
+           🔥 blogPosts — 여기에 글을 계속 추가하면 됨
+        ----------------------------------------------------------*/
         const blogPosts = [
-            { id: 1, title: "혼밥러를 위한 전국 국밥 맛집 BEST 5", date: "2025.12.01", summary: "혼자 먹어도 든든한 국밥 맛집을 엄선했습니다.", content: "<strong>혼밥러를 위한 국밥 맛집</strong><p>부산 돼지국밥, 전주 콩나물국밥 등 전국의 맛집을 소개합니다...</p>" },
-            { id: 2, title: "직장인 점심 메뉴 선택 가이드", date: "2025.11.25", summary: "매일 반복되는 점심 고민을 해결해드립니다.", content: "<strong>효율적인 메뉴 결정</strong><p>시간, 비용, 건강을 고려한 스마트한 선택법...</p>" },
-            { id: 6, title: "실패 없는 야식 추천 10가지", date: "2025.12.03", summary: "밤에 먹어도 부담 적은 메뉴들!", content: "<strong>야식 베스트 10</strong><p>잔치국수, 주먹밥, 오징어 숙회 등...</p>"}
+            { 
+                id: 1,
+                title: "야식 추천 Top 10: 밤에 먹으면 더 행복한 메뉴",
+                date: "2025.12.02",
+                summary: "밤마다 고민되는 야식 메뉴를 가벼운 것부터 묵직한 것까지 10가지로 정리했습니다.",
+                content: `
+                    <p>야식은 하루를 기분 좋게 마무리할 수 있는 최고의 보상입니다. 하지만 매번 고민된다면 이 리스트가 큰 도움이 될 거예요.</p>
+
+                    <strong>1. 치즈라면</strong>
+                    <p>간단하면서도 꾸덕한 풍미를 즐길 수 있는 기본 중의 기본 야식입니다.</p>
+
+                    <strong>2. 마라탕</strong>
+                    <p>중독적인 얼얼함이 필요할 때 딱 맞는 메뉴. 맵기 조절 가능!</p>
+
+                    <strong>3. 순대 + 떡볶이 조합</strong>
+                    <p>가성비와 포만감 모두 만족시키는 국민 야식 조합입니다.</p>
+
+                    <strong>4. 삼각김밥 + 컵라면</strong>
+                    <p>빠르고 간단한 최강 혼자먹기 메뉴.</p>
+
+                    <strong>5. 김치볶음밥</strong>
+                    <p>10분만에 만들 수 있는 간단 메뉴지만 맛은 확실합니다.</p>
+
+                    <strong>6. 닭발</strong>
+                    <p>스트레스 풀리는 매운맛이 필요할 때 추천!</p>
+
+                    <strong>7. 주먹밥 + 우동</strong>
+                    <p>부담 없이 따뜻하게 즐길 수 있는 조합.</p>
+
+                    <strong>8. 군만두</strong>
+                    <p>에어프라이어 10분이면 완성되는 바삭한 행복.</p>
+
+                    <strong>9. 치킨 텐더</strong>
+                    <p>치킨은 부담돼도 텐더는 가볍게 즐길 수 있죠.</p>
+
+                    <strong>10. 떡라면</strong>
+                    <p>라면과 떡의 조합은 언제나 정답!</p>
+
+                    <p>오늘 하루 고생했다면, 너무 고민하지 말고 먹고 싶은 걸로 행복하게 마무리하세요!</p>
+                `
+            }
         ];
 
-        const menuData = {
-            lunch: { office: ["김치찌개", "제육볶음", "돈까스"], solo: ["편의점 도시락", "서브웨이"], friends: ["부대찌개", "파스타"], couple: ["브런치", "수제버거"] },
-            dinner: { office: ["삼겹살", "회식메뉴"], solo: ["치킨 1인세트", "컵라면"], friends: ["조개구이", "곱창"], couple: ["스테이크", "오마카세"] },
-            snack: { office: ["맥주와 감튀"], solo: ["라면", "만두"], friends: ["떡볶이", "치킨"], couple: ["와인과 치즈"] }
-        };
+        /* ---------------------------------------------------------
+           🔥 블로그 렌더링
+        ----------------------------------------------------------*/
+        function renderBlogs() {
+            const list = document.getElementById("blogList");
 
-        // --- 함수 정의 ---
-        function toggleView() {
-            isMenuAppView = !isMenuAppView;
-            if (isMenuAppView) {
-                document.getElementById('recommendation-app').classList.remove('hidden');
-                document.getElementById('blog-content').classList.add('hidden');
-                document.getElementById('toggle-icon').innerText = '📚';
-                document.getElementById('main-header-title').innerText = '오늘의 메뉴 추천 😋';
-            } else {
-                document.getElementById('recommendation-app').classList.add('hidden');
-                document.getElementById('blog-content').classList.remove('hidden');
-                document.getElementById('toggle-icon').innerText = '🏠';
-                document.getElementById('main-header-title').innerText = '푸드 블로그 📖';
-                renderPostList();
-            }
+            blogPosts.forEach(post => {
+                const card = document.createElement("div");
+                card.className = "blog-card";
+
+                card.innerHTML = `
+                    <h2>${post.title}</h2>
+                    <small>${post.date}</small>
+                    <div class="blog-summary">${post.summary}</div>
+
+                    <div class="blog-content">
+                        ${post.content}
+                    </div>
+                `;
+
+                list.appendChild(card);
+            });
         }
 
-        function switchTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('tab-active'));
-            document.querySelector(`[data-tab="${tab}"]`).classList.add('tab-active');
-        }
-
-        function selectConcept(concept) {
-            currentConcept = concept;
-            document.querySelectorAll('.concept-button').forEach(btn => btn.classList.remove('concept-active'));
-            document.querySelector(`[data-concept="${concept}"]`).classList.add('concept-active');
-        }
-
-        function handleRecommendation() {
-            const menus = menuData[currentTab][currentConcept];
-            const randomMenu = menus[Math.floor(Math.random() * menus.length)];
-            document.getElementById('result-text').innerText = randomMenu;
-            document.getElementById('result-text').classList.remove('text-gray-500');
-            document.getElementById('result-text').classList.add('text-red-600', 'font-bold', 'text-2xl');
-        }
-
-        function renderPostList() {
-            const list = document.getElementById('post-list');
-            list.innerHTML = blogPosts.map(post => `
-                <div onclick="showPostDetail(${post.id})" class="blog-post-link block p-4 border border-gray-200 rounded-lg cursor-pointer bg-white">
-                    <h3 class="text-lg font-semibold text-gray-800">${post.title}</h3>
-                    <p class="text-sm text-gray-500 my-1">${post.summary}</p>
-                    <span class="text-xs text-red-500">${post.date}</span>
-                </div>
-            `).join('');
-            showPostList();
-        }
-
-        function showPostDetail(id) {
-            const post = blogPosts.find(p => p.id === id);
-            document.getElementById('post-list-container').classList.add('hidden');
-            document.getElementById('post-detail-container').classList.remove('hidden');
-            document.getElementById('post-detail-title').innerText = post.title;
-            document.getElementById('post-detail-date').innerText = post.date;
-            document.getElementById('post-detail-body').innerHTML = post.content;
-        }
-
-        function showPostList() {
-            document.getElementById('post-list-container').classList.remove('hidden');
-            document.getElementById('post-detail-container').classList.add('hidden');
-        }
+        renderBlogs();
     </script>
+
 </body>
 </html>
